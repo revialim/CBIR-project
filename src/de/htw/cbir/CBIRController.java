@@ -165,10 +165,10 @@ public class CBIRController {
 				calculateFeatureVectors(featureFactory, imageManager.getImages());
 			});
 			
-			// wenn sich die Saturation ändert berechne alle Feature Vektoren neu 
-			settings.addChangeListener(Settings.SettingOption.SATURATION, (SettingChangeEvent event) -> {
-				calculateFeatureVectors(featureFactory, imageManager.getImages());
-			});
+			//// wenn sich die Saturation ändert berechne alle Feature Vektoren neu
+			//settings.addChangeListener(Settings.SettingOption.SATURATION, (SettingChangeEvent event) -> {
+			//	calculateFeatureVectors(featureFactory, imageManager.getImages());
+			//});
 		}
 		
 		// erzeuge die Feature Vektoren

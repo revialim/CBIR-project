@@ -14,30 +14,43 @@ public class ColorHistogram extends FeatureFactory {
 
 	@Override
 	public BufferedImage getFeatureImage(Pic image) {
+		int res = settings.getResolution();
+
 		float[] featureVector = image.getFeatureVector();
+		int numPixel = image.getOrigHeight() * image.getOrigWidth();
+
 		int width = featureVector.length;
-		int height = (int) getMaxValue(featureVector);
+		int height = width;
+		int maxVal = (int) getMaxValue(featureVector);
+
 		
-		BufferedImage bi = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+		BufferedImage bi = new BufferedImage(width , height, BufferedImage.TYPE_INT_ARGB);
 		
 		//Color histCol = new Color(1,1,1);
-		
-		for(int i = 0; i < width; i++){
-			for(int j = 0; j< (int) featureVector[i]; j++){
-				bi.setRGB(i, j, Color.WHITE.getRGB());
-			}
-			for(int j = (int) featureVector[i]; j < height; j++){
-				bi.setRGB(i, j, Color.BLACK.getRGB());
-			}
-		}
-		
+		if(featureVector.length > 1) {
+      for (int i = 0; i < width; i++) {
+        int scaledHeight = (int) (featureVector[i] / maxVal * (width - (width/10)));
+
+        for (int j = 0; j < scaledHeight; j++) {
+          bi.setRGB(i, height - j - 1, Color.WHITE.getRGB());
+        }
+        for (int j = scaledHeight; j < height; j++) {
+          bi.setRGB(i, height - j - 1, Color.BLACK.getRGB());
+        }
+      }
+    } else {
+		  bi.setRGB(0,0,Color.WHITE.getRGB());
+    }
+
 		return bi;
 	}
 
 	@Override
 	public float[] getFeatureVector(Pic image) {
 		BufferedImage bi = image.getDisplayImage();
-		int bins = 4; //TODO settings.numberOfColorBins;
+		int res = settings.getResolution();
+
+		int bins = res; //TODO settings.numberOfColorBins;
 		
 		float[] featureVector = new float[bins*bins*bins];// r, g, b
 	
@@ -52,11 +65,12 @@ public class ColorHistogram extends FeatureFactory {
 				int blue = col & 255;
 				
 				int binsPos = getBinsPosition(red, green, blue, bins);
+				//System.out.println("binsPos for (red:"+red+", green:"+green+", blue"+blue+"): "+binsPos +"; featureVector at binsPos: "+featureVector[binsPos]);
 				featureVector[binsPos]++;
 			}
 		}
 		
-		System.out.println("featureVector at i=0: "+featureVector[0]);
+		//System.out.println("featureVector at i=0: "+featureVector[0]);
 		return featureVector;
 	}
 
@@ -71,16 +85,15 @@ public class ColorHistogram extends FeatureFactory {
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+		return "ColorHistogram";
 	}
 	
 	
 	// ===== helper functions === 
 	
 	static int getBinsPosition(int red, int green, int blue, int bins){
-		int binStep = (int) 256/bins;
-		
+		int binStep = (int) Math.ceil(256.0/(float)bins);
+
 		int rIndex = red/binStep;//implicit rounding to floor
 		int gIndex = green/binStep;
 		int bIndex = blue/binStep;
