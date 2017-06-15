@@ -22,16 +22,28 @@ public class ColorSignature extends FeatureFactory{
   @Override
   public BufferedImage getFeatureImage(Pic image) {
     int res = settings.getResolution();
+    //use resolution as number of colors for signature
 
     float[] featureVector = image.getFeatureVector();
     int numPixel = image.getOrigHeight() * image.getOrigWidth();
 
-    int width = 1;
+
+    int width = (int) Math.sqrt(featureVector.length) +1; //enough space to draw signature colors
     int height = width;
+    System.out.println("width: "+ width +", featureVector.length: "+ featureVector.length);
 
     BufferedImage bi = new BufferedImage(width , height, BufferedImage.TYPE_INT_ARGB);
 
-    bi.setRGB(0, 0, Color.WHITE.getRGB());
+    for(int x = 0; x < width; x++){
+      for(int y = 0; y < height; y++){
+        if((x + y * width) < featureVector.length){
+          bi.setRGB(x, y, (int) featureVector[x + y * width]);
+        }
+        //todo get correct position in featureVector for setting bi color
+      }
+    }
+
+    //bi.setRGB(0, 0, Color.WHITE.getRGB());
 
 
     return bi;
@@ -41,24 +53,11 @@ public class ColorSignature extends FeatureFactory{
   public float[] getFeatureVector(Pic image) {
     BufferedImage bi = image.getDisplayImage();
     int res = settings.getResolution();
+    //use resolution as number of colors for signature
 
-    int bins = res;
-    float[] featureVector = new float[bins*bins*bins];
+    //int bins = res;
+    float[] featureVector = callMedianCut(bi, res);
 
-    int width = bi.getWidth();
-    int height = bi.getHeight();
-
-    for(int x = 0; x < width; x++){
-      for(int y = 0; y < height; y++){
-        int col = bi.getRGB(x, y);
-        int red = (col >> 16) & 255;
-        int green = (col >> 8) & 255;
-        int blue = col & 255;
-
-      }
-    }
-
-    //System.out.println("featureVector at i=0: "+featureVector[0]);
     return featureVector;
   }
 
@@ -79,9 +78,20 @@ public class ColorSignature extends FeatureFactory{
 
   // ===== helper functions ===
 
-  void callMedianCut(BufferedImage image){
-    int numberOfColors = 8;
+  float[] convertColorTriples(List<ColorTriple> featureColors){
+    float[] featureVector = new float[featureColors.size()];
+
+    for(int i = 0; i < featureColors.size(); i++){
+      //System.out.println("featureColors: "+featureColors.get(i).red +", "+ featureColors.get(i).green+", "+ featureColors.get(i).blue);
+      Color col = new Color(featureColors.get(i).red, featureColors.get(i).green, featureColors.get(i).blue);
+      featureVector[i] = col.getRGB();
+    }
+    return featureVector;
+  }
+
+  float[] callMedianCut(BufferedImage image, int numberOfColors){
     List<ColorTriple> pixels = new ArrayList<>();
+    List<ColorTriple> signatureColors = new ArrayList<>();
 
     // put all the pixels in a pixels bucket
     for(int x = 0; x < image.getWidth(); x++){
@@ -91,11 +101,18 @@ public class ColorSignature extends FeatureFactory{
         int green = (col >> 8) & 255;
         int blue = col & 255;
         pixels.add(new ColorTriple(red, green, blue));
+        //works til here...
+        //System.out.println("pixels at ("+x +", "+ y +"): red: "+red +", green: "+ green +", blue: "+blue);
       }
     }
+    signatureColors = medianCut(numberOfColors, pixels);
+    System.out.println("numberOfColors: "+numberOfColors);
+    System.out.println("pixels at 0: "+ pixels.get(0).red +", "+ pixels.get(0).green +", "+ pixels.get(0).blue);
+    System.out.println("signatureColors at 0: "+ signatureColors.get(0).red +", "+ signatureColors.get(0).green +", "+ signatureColors.get(0).blue);
 
-    //TODO receive colors from medianCut...
-    medianCut(numberOfColors, pixels);
+    //turn list<colortriple> into float[] which will be the feature vector
+    //and return the float array
+    return convertColorTriples(signatureColors);
   }
 
   List<ColorTriple> medianCut(int numColors, List<ColorTriple> pixels){
@@ -106,20 +123,24 @@ public class ColorSignature extends FeatureFactory{
       //return meanColor of pixels
       colors.add(meanColorTriple(pixels));
       return colors;
+
     } else {
       //find out if red, green, or blue has the widest range
-      int rangeRed = rangeOfChannel("r", pixels);
-      int rangeGreen = rangeOfChannel("g", pixels);
-      int rangeBlue = rangeOfChannel("b", pixels);
+      int rangeRed = rangeOfChannel(ColChannel.R, pixels);
+      int rangeGreen = rangeOfChannel(ColChannel.G, pixels);
+      int rangeBlue = rangeOfChannel(ColChannel.B, pixels);
 
       if (rangeRed > rangeGreen && rangeRed > rangeBlue) {
         //sort (and cut) along red channel dimension
+        pixels = sortAccordingToChannel(ColChannel.R, pixels);
       }
       if (rangeGreen > rangeRed && rangeGreen > rangeBlue) {
         //sort (and cut) along green channel dimension
+        pixels = sortAccordingToChannel(ColChannel.G, pixels);
       }
       if (rangeBlue > rangeRed && rangeBlue > rangeGreen) {
         //sort (and cut) along blue channel dimension
+        pixels = sortAccordingToChannel(ColChannel.B, pixels);
       }
 
       //cutttt
@@ -134,17 +155,17 @@ public class ColorSignature extends FeatureFactory{
   }
 
 
-  List<ColorTriple> sortAccordingToChannel(String channel, List<ColorTriple> pixels){
-    if(channel.equals("r")) {
+  List<ColorTriple> sortAccordingToChannel(ColChannel channel, List<ColorTriple> pixels){
+    if(channel.equals(ColChannel.R)) {
       return pixels.stream().sorted((a, b) -> Integer.compare(a.red, b.red)).collect(Collectors.toList());
     }
-    if(channel.equals("g")) {
+    if(channel.equals(ColChannel.G)) {
       return pixels.stream().sorted((a, b) -> Integer.compare(a.green, b.green)).collect(Collectors.toList());
     }
-    if(channel.equals("b")) {
+    if(channel.equals(ColChannel.B)) {
       return pixels.stream().sorted((a, b) -> Integer.compare(a.blue, b.blue)).collect(Collectors.toList());
     }
-    throw new IllegalArgumentException("channel needs to be 'r', 'g' or 'b'. ");
+    throw new IllegalArgumentException("channel needs to be 'R', 'G' or 'B' from ColChannel. ");
   }
   /**
    * returns the range of the pixels according to
@@ -154,9 +175,9 @@ public class ColorSignature extends FeatureFactory{
    * @param pixels List of ColorTriple containing the pixels
    * @return int range
    */
-  int rangeOfChannel(String channel, List<ColorTriple> pixels){
+  int rangeOfChannel(ColChannel channel, List<ColorTriple> pixels){
 
-    if(channel == "r"){
+    if(channel == ColChannel.R){
       int max = pixels.get(0).red;
       int min = pixels.get(0).red;
 
@@ -172,7 +193,7 @@ public class ColorSignature extends FeatureFactory{
       return max - min;
     }
 
-    if(channel == "g"){
+    if(channel == ColChannel.G){
       int max = pixels.get(0).green;
       int min = pixels.get(0).green;
 
@@ -188,7 +209,7 @@ public class ColorSignature extends FeatureFactory{
       return max - min;
     }
 
-    if(channel == "b"){
+    if(channel == ColChannel.B){
       int max = pixels.get(0).blue;
       int min = pixels.get(0).blue;
 
@@ -204,23 +225,29 @@ public class ColorSignature extends FeatureFactory{
       return max - min;
     }
 
-    else {
-      System.out.println("wrong channel chosen in rangeOfChannel");
-      return -1;
-    }
+    throw new IllegalArgumentException("channel needs to be 'R', 'G' or 'B' from ColChannel. ");
   }
 
 
   ColorTriple meanColorTriple(List<ColorTriple> pixels){
+    //todo problems can occur when pixels is too big
     float red = 0;
     float green = 0;
     float blue = 0;
 
     for(int i = 0; i < pixels.size(); i++){
-      red = red + pixels.get(i).red / pixels.size();
-      green = green + pixels.get(i).green / pixels.size();
-      blue = blue + pixels.get(i).blue / pixels.size();
+      red = red + pixels.get(i).red;
+      green = green + pixels.get(i).green;
+      blue = blue + pixels.get(i).blue;
+
+      //System.out.println("i = "+i +": "+ pixels.get(i).red +", "+ pixels.get(i).red / pixels.size()  );
     }
+
+    red = red / pixels.size();
+    green = green / pixels.size();
+    blue = blue / pixels.size();
+
+    System.out.println("meanColorTriple: "+ red +", "+ green +", "+ blue);
 
     return new ColorTriple((int)red, (int)green, (int)blue);
   }

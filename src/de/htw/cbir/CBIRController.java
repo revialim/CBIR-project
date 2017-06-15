@@ -5,11 +5,7 @@ import java.util.Locale;
 
 import de.htw.cbir.evaluation.CBIREvaluation;
 import de.htw.cbir.evaluation.PrecisionRecallTable;
-import de.htw.cbir.feature.ColorHistogram;
-import de.htw.cbir.feature.ColorMean;
-import de.htw.cbir.feature.ColorMeanSaturation;
-import de.htw.cbir.feature.ColorMeanThumbnail;
-import de.htw.cbir.feature.FeatureFactory;
+import de.htw.cbir.feature.*;
 import de.htw.cbir.model.Pic;
 import de.htw.cbir.model.PicPair;
 import de.htw.cbir.model.Settings;
@@ -115,7 +111,7 @@ public class CBIRController {
 	 * @return
 	 */
 	public String[] getFeatureFactoryNames() {
-		return new String[] { "ColorMean", "ColorMeanSaturation", "ColorMeanThumbnail", "ColorHistogram" };
+		return new String[] { "ColorMean", "ColorMeanSaturation", "ColorMeanThumbnail", "ColorHistogram", "ColorSignature" };
 	}
 	
 	/**
@@ -165,6 +161,21 @@ public class CBIRController {
 				calculateFeatureVectors(featureFactory, imageManager.getImages());
 			});
 			
+			//// wenn sich die Saturation ändert berechne alle Feature Vektoren neu
+			//settings.addChangeListener(Settings.SettingOption.SATURATION, (SettingChangeEvent event) -> {
+			//	calculateFeatureVectors(featureFactory, imageManager.getImages());
+			//});
+		} else if(name.equalsIgnoreCase("ColorSignature")) {
+			featureFactory = new ColorSignature(settings);
+
+			settings.addChangeListener(Settings.SettingOption.RESOLUTION, (SettingChangeEvent event) -> {
+				calculateFeatureVectors(featureFactory, imageManager.getImages());
+			});
+
+			settings.addChangeListener(Settings.SettingOption.METRIC, (SettingChangeEvent event) -> {
+				calculateFeatureVectors(featureFactory, imageManager.getImages());
+			});
+
 			//// wenn sich die Saturation ändert berechne alle Feature Vektoren neu
 			//settings.addChangeListener(Settings.SettingOption.SATURATION, (SettingChangeEvent event) -> {
 			//	calculateFeatureVectors(featureFactory, imageManager.getImages());

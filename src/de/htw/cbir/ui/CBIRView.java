@@ -112,7 +112,7 @@ public class CBIRView  {
 		
 		// Resolution sub-menu
 		JMenu m_resValue = new JMenu("Resolution");
-		final JSliderDecimal resSlider = JSliderDecimal.createDoubleJSlider(1, 10, 4, 1);
+		final JSliderDecimal resSlider = JSliderDecimal.createDoubleJSlider(1, 20, 4, 1);
 		resSlider.setMajorTickSpacing(4);
 		resSlider.setMinorTickSpacing(1);
 		resSlider.setPaintTicks(true);
