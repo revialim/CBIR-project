@@ -41,8 +41,25 @@ public abstract class FeatureFactory {
 			dist += buff * buff;
 		}
 		return dist;
-	}	
-	
+	}
+
+	/**
+	 * Earth Movers Distance
+	 */
+	public static float getEarthMoversDistance(float[] val1, float[] val2) {
+		float dist = 0;
+		//assumption: val1.length same as val2.length
+		float tmpDist = val1[0] - val2[0];
+
+		for(int i = 1; i < val2.length; i++){
+			//iterate over val1
+			tmpDist = val1[i] + tmpDist - val2[i];
+			dist = dist + Math.abs(tmpDist);
+		}
+
+		return dist;
+	}
+
 	/**
 	 * Visualisiere den Feature Vektor für ein Bild
 	 * 

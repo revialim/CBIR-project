@@ -5,7 +5,6 @@ import de.htw.cbir.model.Settings;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.Comparator;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
@@ -65,8 +64,10 @@ public class ColorSignature extends FeatureFactory{
   public float getDistance(float[] fv1, float[] fv2) {
     if(settings.getMetric() == 1){
       return getL1Distance(fv1, fv2);
-    } else { //metric == 2
+    } else if(settings.getMetric() == 2) { //metric == 2
       return getL2Distance(fv1, fv2);
+    } else {  //metric == 3
+      return getEarthMoversDistance(fv1, fv2);
     }
   }
 

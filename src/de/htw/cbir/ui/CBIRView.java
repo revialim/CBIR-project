@@ -128,7 +128,7 @@ public class CBIRView  {
 		
 		// Resolution sub-menu
 		JMenu m_metricValue = new JMenu("Metric");
-		final JSliderDecimal metricSlider = JSliderDecimal.createDoubleJSlider(1, 2, 1, 1);
+		final JSliderDecimal metricSlider = JSliderDecimal.createDoubleJSlider(1, 3, 1, 1);
 		metricSlider.setMajorTickSpacing(1);
 		metricSlider.setMinorTickSpacing(1);
 		metricSlider.setPaintTicks(true);
