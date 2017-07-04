@@ -122,7 +122,14 @@ public class ColorSignature extends FeatureFactory{
     //recursion anchor
     if(numColors <= 1){
       //return meanColor of pixels
-      colors.add(meanColorTriple(pixels));
+      ColorTriple c = meanColorTriple(pixels);
+      colors.add(c);
+      if(c.red == 254 && c.green == 254 && c.blue == 254){
+        System.out.println(pixels.size());
+        for(int i = 0; i < 3; i++){
+          System.out.println("pixels for mean color at(i="+i+") r: "+ pixels.get(i).red +", g: "+ pixels.get(i).green +", b: "+ pixels.get(i).blue);
+        }
+      }
       return colors;
 
     } else {
@@ -131,22 +138,20 @@ public class ColorSignature extends FeatureFactory{
       int rangeGreen = rangeOfChannel(ColChannel.G, pixels);
       int rangeBlue = rangeOfChannel(ColChannel.B, pixels);
 
-      if (rangeRed > rangeGreen && rangeRed > rangeBlue) {
+      if (rangeRed >= rangeGreen && rangeRed >= rangeBlue) {
         //sort (and cut) along red channel dimension
         pixels = sortAccordingToChannel(ColChannel.R, pixels);
-      }
-      if (rangeGreen > rangeRed && rangeGreen > rangeBlue) {
+      } else if (rangeGreen > rangeRed && rangeGreen >=rangeBlue) {
         //sort (and cut) along green channel dimension
         pixels = sortAccordingToChannel(ColChannel.G, pixels);
-      }
-      if (rangeBlue > rangeRed && rangeBlue > rangeGreen) {
+      } else if (rangeBlue >= rangeRed && rangeBlue > rangeGreen) {
         //sort (and cut) along blue channel dimension
         pixels = sortAccordingToChannel(ColChannel.B, pixels);
       }
 
       //cutttt
-      List<ColorTriple> pixelsFirstHalf = new ArrayList<>(pixels.subList(0, pixels.size() / 2 - 1));
-      List<ColorTriple> pixelsSecondHalf = new ArrayList<>(pixels.subList(pixels.size() / 2, pixels.size() - 1));
+      List<ColorTriple> pixelsFirstHalf = new ArrayList<>(pixels.subList(0, (pixels.size() / 2) - 1));
+      List<ColorTriple> pixelsSecondHalf = new ArrayList<>(pixels.subList((pixels.size() / 2), pixels.size() - 1));
       //recursive call
       colors.addAll(medianCut(numColors / 2, pixelsFirstHalf));
       colors.addAll(medianCut(numColors - numColors / 2, pixelsSecondHalf));
@@ -248,7 +253,7 @@ public class ColorSignature extends FeatureFactory{
     green = green / pixels.size();
     blue = blue / pixels.size();
 
-    System.out.println("meanColorTriple: "+ red +", "+ green +", "+ blue);
+   // System.out.println("meanColorTriple: "+ red +", "+ green +", "+ blue);
 
     return new ColorTriple((int)red, (int)green, (int)blue);
   }

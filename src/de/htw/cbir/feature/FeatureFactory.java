@@ -61,6 +61,54 @@ public abstract class FeatureFactory {
 	}
 
 	/**
+	 * Classical Hausdorff Distance
+	 */
+	public static float getHausdorffDistance(float[] val1, float[] val2){
+		float sup1 = getSupOfInf(val1, val2);
+		float sup2 = getSupOfInf(val2, val1);
+
+		if(sup1 > sup2){
+			return sup1;
+		} else {
+			return sup2;
+		}
+	}
+
+	// Get supremum of all infima...
+	private static float getSupOfInf(float[] firstVal, float[] secondVal){
+		int featLength = firstVal.length;
+		float sup = 0;
+
+		//infimum for each temporary distance val1_i
+		for(float a : firstVal){
+			for(int i = 0; i < featLength; i++){
+				float tmpInf = Math.abs(a - secondVal[i]);
+				if(tmpInf > sup){
+					sup = tmpInf;
+				}
+			}
+		}
+
+		return sup;
+	}
+
+	/**
+	 * Perceptually Modified Hausdorff Distance
+	 */
+	public static float getPMHausdorffDistance(float[] val1, float[] val2){
+
+		//todo replace val1 and val2 with corresponding signatures for val1 and val2
+		float sup1 = getSupOfInf(val1, val2);
+		float sup2 = getSupOfInf(val2, val1);
+
+		if(sup1 > sup2){
+			return sup1;
+		} else {
+			return sup2;
+		}
+	}
+
+	/**
 	 * Visualisiere den Feature Vektor für ein Bild
 	 * 
 	 * @param image
