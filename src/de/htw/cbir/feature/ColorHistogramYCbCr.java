@@ -17,7 +17,29 @@ public class ColorHistogramYCbCr extends FeatureFactory{
 
   @Override
   public BufferedImage getFeatureImage(Pic image) {
-    return null;
+    float[] featureVector = image.getFeatureVector();
+    int width = featureVector.length;
+    int height = width;
+    int maxVal = (int) getMaxValue(featureVector);
+
+    BufferedImage bi = new BufferedImage(width , height, BufferedImage.TYPE_INT_ARGB);
+
+    if(featureVector.length > 1) {
+      for (int i = 0; i < width; i++) {
+        int scaledHeight = (int) (featureVector[i] / maxVal * (width - (width/10)));
+
+        for (int j = 0; j < scaledHeight; j++) {
+          bi.setRGB(i, height - j - 1, Color.WHITE.getRGB());
+        }
+        for (int j = scaledHeight; j < height; j++) {
+          bi.setRGB(i, height - j - 1, Color.BLACK.getRGB());
+        }
+      }
+    } else {
+      bi.setRGB(0,0,Color.WHITE.getRGB());
+    }
+
+    return bi;
   }
 
   @Override
@@ -26,9 +48,21 @@ public class ColorHistogramYCbCr extends FeatureFactory{
     int res = settings.getResolution();
     int bins = res; //TODO get numbers of bins from additional UI Slider
 
-    //TODO transform image from RGB to YCbCr
+    float[] featureVector = new float[bins*bins*bins];//lum, cb, cr
 
-    return new float[0];
+    int width = bi.getWidth();
+    int height = bi.getHeight();
+
+    for(int x = 0; x < width; x++){
+      for(int y = 0; y < height; y++){
+        YCbCrCol ycbcrCol = new YCbCrCol(bi.getRGB(x, y));
+        int binsPos = getBinsPosition(ycbcrCol, bins);
+        //System.out.println("binsPos: "+binsPos);
+        featureVector[binsPos]++;
+      }
+    }
+
+    return featureVector;
   }
 
   @Override
@@ -47,48 +81,31 @@ public class ColorHistogramYCbCr extends FeatureFactory{
     return "YCbCrHistogram";
   }
 
-  private BufferedImage getYCbCrImg(BufferedImage bufferedImage){
-    //int[] rgbArr = bufferedImage.getRGB(
-    //    0,
-    //    0,
-    //    bufferedImage.getWidth(),
-    //    bufferedImage.getHeight(),
-    //    null,
-    //    0, bufferedImage.getWidth()
-    //);
-
-    int width = bufferedImage.getWidth();
-    int height = bufferedImage.getHeight();
-
-    for(int x = 0; x < width; x++){
-      for(int y = 0; y < height; y++){
-        int rgb = bufferedImage.getRGB(x,y);
-
-
-
-
-
-      }
-    }
-
-
-    return null;
-  }
-
-
   static int getBinsPosition(YCbCrCol col, int bins){
-    double binStep = 1/bins;
+    double binStep = 1.0/bins;
 
     int lumIndex = (int) ( col.lum      /binStep);
     int crIndex =  (int) ((col.cr + 0.5)/binStep);
     int cbIndex =  (int) ((col.cb + 0.5)/binStep);
+
+    lumIndex = (lumIndex == bins) ? lumIndex-1 : lumIndex;
+    crIndex = (crIndex == bins) ? crIndex-1 : crIndex;
+    cbIndex = (cbIndex == bins) ? cbIndex-1 : cbIndex;
 
     int index = lumIndex + crIndex*bins + cbIndex*bins*bins;
 
     return index;
   }
 
-
+  static float getMaxValue(float[] arr){
+    float max = 0;
+    for(int i = 0; i<arr.length; i++){
+      if(arr[i] > max){
+        max = arr[i];
+      }
+    }
+    return max;
+  }
 
   private class YCbCrCol {
 
