@@ -25,8 +25,7 @@ public class ColorHistogram extends FeatureFactory {
 
 		
 		BufferedImage bi = new BufferedImage(width , height, BufferedImage.TYPE_INT_ARGB);
-		
-		//Color histCol = new Color(1,1,1);
+
 		if(featureVector.length > 1) {
       for (int i = 0; i < width; i++) {
         int scaledHeight = (int) (featureVector[i] / maxVal * (width - (width/10)));
