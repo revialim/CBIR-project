@@ -33,12 +33,18 @@ public class ColorHistogramYCbCr extends FeatureFactory{
 
   @Override
   public float getDistance(float[] fv1, float[] fv2) {
-    return 0;
+    if(settings.getMetric() == 1){
+      return getL1Distance(fv1, fv2);
+    } else if(settings.getMetric() == 2){
+      return getL2Distance(fv1, fv2);
+    } else { //metric == 3
+      return getEarthMoversDistance(fv1, fv2);
+    }
   }
 
   @Override
   public String getName() {
-    return null;
+    return "YCbCrHistogram";
   }
 
   private BufferedImage getYCbCrImg(BufferedImage bufferedImage){
@@ -68,6 +74,20 @@ public class ColorHistogramYCbCr extends FeatureFactory{
 
     return null;
   }
+
+
+  static int getBinsPosition(YCbCrCol col, int bins){
+    double binStep = 1/bins;
+
+    int lumIndex = (int) ( col.lum      /binStep);
+    int crIndex =  (int) ((col.cr + 0.5)/binStep);
+    int cbIndex =  (int) ((col.cb + 0.5)/binStep);
+
+    int index = lumIndex + crIndex*bins + cbIndex*bins*bins;
+
+    return index;
+  }
+
 
 
   private class YCbCrCol {
