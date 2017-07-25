@@ -111,7 +111,7 @@ public class CBIRController {
 	 * @return
 	 */
 	public String[] getFeatureFactoryNames() {
-		return new String[] { "ColorMean", "ColorMeanSaturation", "ColorMeanThumbnail", "ColorHistogram", "ColorSignature" };
+		return new String[] { "ColorMean", "ColorMeanSaturation", "ColorMeanThumbnail", "ColorHistogram", "ColorSignature", "YCbCrHistogram" };
 	}
 	
 	/**
@@ -152,20 +152,16 @@ public class CBIRController {
 		}
 		else if(name.equalsIgnoreCase("ColorHistogram")) {
 			featureFactory = new ColorHistogram(settings);
-			
+
 			settings.addChangeListener(Settings.SettingOption.RESOLUTION, (SettingChangeEvent event) -> {
 				calculateFeatureVectors(featureFactory, imageManager.getImages());
 			});
-			
+
 			settings.addChangeListener(Settings.SettingOption.METRIC, (SettingChangeEvent event) -> {
 				calculateFeatureVectors(featureFactory, imageManager.getImages());
 			});
-			
-			//// wenn sich die Saturation ändert berechne alle Feature Vektoren neu
-			//settings.addChangeListener(Settings.SettingOption.SATURATION, (SettingChangeEvent event) -> {
-			//	calculateFeatureVectors(featureFactory, imageManager.getImages());
-			//});
-		} else if(name.equalsIgnoreCase("ColorSignature")) {
+		}
+		else if(name.equalsIgnoreCase("ColorSignature")) {
 			featureFactory = new ColorSignature(settings);
 
 			settings.addChangeListener(Settings.SettingOption.RESOLUTION, (SettingChangeEvent event) -> {
@@ -175,13 +171,19 @@ public class CBIRController {
 			settings.addChangeListener(Settings.SettingOption.METRIC, (SettingChangeEvent event) -> {
 				calculateFeatureVectors(featureFactory, imageManager.getImages());
 			});
-
-			//// wenn sich die Saturation ändert berechne alle Feature Vektoren neu
-			//settings.addChangeListener(Settings.SettingOption.SATURATION, (SettingChangeEvent event) -> {
-			//	calculateFeatureVectors(featureFactory, imageManager.getImages());
-			//});
 		}
-		
+		else if(name.equalsIgnoreCase("YCbCrHistogram")) {
+			featureFactory = new ColorHistogramYCbCr(settings);
+
+			settings.addChangeListener(Settings.SettingOption.RESOLUTION, (SettingChangeEvent event) -> {
+				calculateFeatureVectors(featureFactory, imageManager.getImages());
+			});
+
+			settings.addChangeListener(Settings.SettingOption.METRIC, (SettingChangeEvent event) -> {
+				calculateFeatureVectors(featureFactory, imageManager.getImages());
+			});
+		}
+
 		// erzeuge die Feature Vektoren
 		if(featureFactory != null)
 			calculateFeatureVectors(featureFactory, imageManager.getImages());
