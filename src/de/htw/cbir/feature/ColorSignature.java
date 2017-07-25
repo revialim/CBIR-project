@@ -5,6 +5,7 @@ import de.htw.cbir.model.Settings;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.Comparator;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
@@ -92,7 +93,7 @@ public class ColorSignature extends FeatureFactory{
 
   float[] callMedianCut(BufferedImage image, int numberOfColors){
     List<ColorTriple> pixels = new ArrayList<>();
-    List<ColorTriple> signatureColors = new ArrayList<>();
+    List<ColorTriple> signatureColors;
 
     // put all the pixels in a pixels bucket
     for(int x = 0; x < image.getWidth(); x++){
@@ -163,13 +164,13 @@ public class ColorSignature extends FeatureFactory{
 
   List<ColorTriple> sortAccordingToChannel(ColChannel channel, List<ColorTriple> pixels){
     if(channel.equals(ColChannel.R)) {
-      return pixels.stream().sorted((a, b) -> Integer.compare(a.red, b.red)).collect(Collectors.toList());
+      return pixels.stream().sorted(Comparator.comparingInt(a -> a.red)).collect(Collectors.toList());
     }
     if(channel.equals(ColChannel.G)) {
-      return pixels.stream().sorted((a, b) -> Integer.compare(a.green, b.green)).collect(Collectors.toList());
+      return pixels.stream().sorted(Comparator.comparingInt(a -> a.green)).collect(Collectors.toList());
     }
     if(channel.equals(ColChannel.B)) {
-      return pixels.stream().sorted((a, b) -> Integer.compare(a.blue, b.blue)).collect(Collectors.toList());
+      return pixels.stream().sorted(Comparator.comparingInt(a -> a.blue)).collect(Collectors.toList());
     }
     throw new IllegalArgumentException("channel needs to be 'R', 'G' or 'B' from ColChannel. ");
   }
