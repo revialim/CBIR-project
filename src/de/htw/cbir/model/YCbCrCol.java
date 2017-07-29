@@ -11,9 +11,9 @@ public class YCbCrCol {
   final static double kg = 0.587;
   final static double kb = 0.114;
 
-  final double lum, cb, cr;
+  private final double lum, cb, cr;
 
-  YCbCrCol(double lum, double cb, double cr) {
+  public YCbCrCol(double lum, double cb, double cr) {
     this.lum = lum;
     this.cb = cb;
     this.cr = cr;
@@ -27,7 +27,6 @@ public class YCbCrCol {
     double rPercent = red / 255;
     double gPercent = green / 255;
     double bPercent = blue / 255;
-
 
     this.lum = kr * rPercent + kg * gPercent + kb * bPercent;
     this.cb = 0.5 * ((bPercent - lum) / (1 - kb));
@@ -46,7 +45,7 @@ public class YCbCrCol {
     return cr;
   }
 
-  private int getRGB() {
+  public int getRGB() {
     double rPercent = cr * 2 * (1 - kr) + lum;
     double bPercent = cb * 2 * (1 - kb) + lum;
 
