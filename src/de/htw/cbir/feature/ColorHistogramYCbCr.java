@@ -7,9 +7,7 @@ import de.htw.cbir.model.YCbCrCol;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
-/**
- * Created by lili on 24.07.17.
- */
+
 public class ColorHistogramYCbCr extends FeatureFactory{
   public ColorHistogramYCbCr(Settings settings) {
     super(settings);
@@ -45,8 +43,7 @@ public class ColorHistogramYCbCr extends FeatureFactory{
   @Override
   public float[] getFeatureVector(Pic image) {
     BufferedImage bi = image.getDisplayImage();
-    int res = settings.getResolution();
-    int bins = res; //TODO get numbers of bins from additional UI Slider
+    int bins = settings.getResolution(); //TODO get numbers of bins from additional UI Slider
 
     float[] featureVector = new float[bins*bins*bins];//lum, cb, cr
 
@@ -81,7 +78,7 @@ public class ColorHistogramYCbCr extends FeatureFactory{
     return "YCbCrHistogram";
   }
 
-  static int getBinsPosition(YCbCrCol col, int bins){
+  private static int getBinsPosition(YCbCrCol col, int bins){
     double binStep = 1.0/bins;
 
     int lumIndex = (int) ( col.getLum()      /binStep);
@@ -92,16 +89,14 @@ public class ColorHistogramYCbCr extends FeatureFactory{
     crIndex = (crIndex == bins) ? crIndex-1 : crIndex;
     cbIndex = (cbIndex == bins) ? cbIndex-1 : cbIndex;
 
-    int index = lumIndex + crIndex*bins + cbIndex*bins*bins;
-
-    return index;
+    return lumIndex + crIndex*bins + cbIndex*bins*bins;
   }
 
-  static float getMaxValue(float[] arr){
+  private static float getMaxValue(float[] arr){
     float max = 0;
-    for(int i = 0; i<arr.length; i++){
-      if(arr[i] > max){
-        max = arr[i];
+    for (float anArr : arr) {
+      if (anArr > max) {
+        max = anArr;
       }
     }
     return max;
