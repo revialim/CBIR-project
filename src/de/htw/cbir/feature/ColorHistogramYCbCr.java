@@ -2,10 +2,10 @@ package de.htw.cbir.feature;
 
 import de.htw.cbir.model.Pic;
 import de.htw.cbir.model.Settings;
+import de.htw.cbir.model.YCbCrCol;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.Collections;
 
 /**
  * Created by lili on 24.07.17.
@@ -84,9 +84,9 @@ public class ColorHistogramYCbCr extends FeatureFactory{
   static int getBinsPosition(YCbCrCol col, int bins){
     double binStep = 1.0/bins;
 
-    int lumIndex = (int) ( col.lum      /binStep);
-    int crIndex =  (int) ((col.cr + 0.5)/binStep);
-    int cbIndex =  (int) ((col.cb + 0.5)/binStep);
+    int lumIndex = (int) ( col.getLum()      /binStep);
+    int crIndex =  (int) ((col.getCb() + 0.5)/binStep);
+    int cbIndex =  (int) ((col.getCr() + 0.5)/binStep);
 
     lumIndex = (lumIndex == bins) ? lumIndex-1 : lumIndex;
     crIndex = (crIndex == bins) ? crIndex-1 : crIndex;
@@ -107,42 +107,4 @@ public class ColorHistogramYCbCr extends FeatureFactory{
     return max;
   }
 
-  private class YCbCrCol {
-
-    final static double kr = 0.299;//todo find out how to calculate/define theses values
-    final static double kg = 0.587;
-    final static double kb = 0.114;
-
-    double lum, cb, cr;
-    YCbCrCol(double lum, double cb, double cr){
-      this.lum = lum;
-      this.cb = cb;
-      this.cr = cr;
-    }
-
-    YCbCrCol(int rgb){
-      int red = (rgb >> 16) & 255;
-      int green = (rgb >> 8) & 255;
-      int blue = (rgb ) & 255;
-
-      double rPercent = red / 255;
-      double gPercent = green / 255;
-      double bPercent = blue /255;
-
-
-      this.lum = kr * rPercent + kg * gPercent + kb * bPercent;
-      this.cb = 0.5 * ((bPercent - lum)/(1 - kb));
-      this.cr = 0.5 * ((rPercent - lum)/(1 - kr));
-    }
-
-    private int getRGB(){
-      double rPercent = cr * 2 * (1 - kr) + lum;
-      double bPercent = cb * 2 * (1 - kb) + lum;
-
-      double gPercent = (lum - kr * rPercent - kb * bPercent)/kg;
-
-      Color c = new Color((int) rPercent* 255, (int) gPercent*255, (int) bPercent*255);
-      return c.getRGB();
-    }
-  }
 }
