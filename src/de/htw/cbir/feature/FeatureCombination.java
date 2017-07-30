@@ -8,14 +8,16 @@ import java.awt.image.BufferedImage;
 
 
 public class FeatureCombination extends FeatureFactory {
-  private ColorHistogramYCgCo histogram;
+  private ColorHistogramYCgCo histogramYCgCo;
   private ColorMeanThumbnail thumbnail;
+  private ColorHistogram histogramRGB;
 
   public FeatureCombination(Settings settings) {
     super(settings);
 
-    histogram = new ColorHistogramYCgCo(settings);
+    histogramYCgCo = new ColorHistogramYCgCo(settings);
     thumbnail = new ColorMeanThumbnail(settings);
+    histogramRGB = new ColorHistogram(settings);
   }
 
 
@@ -54,22 +56,45 @@ public class FeatureCombination extends FeatureFactory {
   @Override
   public float[] getFeatureVector(Pic image) {
     //TODO combine both feature vectors
-    float[] histFV = normalize(histogram.getFeatureVector(image));
-    float[] thumbFV = normalize(thumbnail.getFeatureVector(image));
+    float[] f1 = normalize(histogramYCgCo.getFeatureVector(image));
+    float[] f2 = normalize(thumbnail.getFeatureVector(image));
+    float[] f3 = normalize(histogramRGB.getFeatureVector(image));
 
-    int fvLength = (histFV.length < thumbFV.length)? thumbFV.length : histFV.length;
+    //set fvLength to the longest out of the given three feature vectors
+    int fvLength = (f1.length < f2.length)? f2.length : f1.length;
+    fvLength = (fvLength < f3.length)? f3.length : fvLength;
 
     float[] combi = new float[fvLength];
 
-    double alpha = 0.4;
+    double alpha = settings.getAlpha();
+    double beta_val = settings.getBeta();
+    double beta = (1 - alpha)* beta_val;
+    double gamma = 1 - beta - alpha;//remainder for gamma value
 
     for(int i = 0; i < combi.length; i++){
-      if(histFV.length > i && thumbFV.length > i){
-        combi[i] = (float) (histFV[i] * alpha + thumbFV[i] * (1 - alpha));
-      } else if(histFV.length <= i && thumbFV.length > i){
-        combi[i] = thumbFV[i];
-      } else if(thumbFV.length <= i && histFV.length > i){
-        combi[i] = histFV[i];
+      if(f1.length > i && f2.length > i && f3.length > i){
+        combi[i] = (float) (f1[i] * alpha + f2[i] * beta + f3[i] * gamma);
+      }
+      else if(f1.length <= i && f2.length > i && f3.length > i){
+        combi[i] = (float) (f2[i] * alpha + f3[i] * (1 - alpha));
+      }
+      else if(f1.length > i && f2.length <= i && f3.length > i){
+        combi[i] = (float) (f1[i] * alpha + f3[i] * (1 - alpha));
+      }
+      else if(f1.length > i && f2.length > i && f3.length <= i){
+        combi[i] = (float) (f1[i] * alpha + f2[i] * (1 - alpha));
+      }
+      else if(f1.length > i && f2.length <= i && f3.length <= i){
+        combi[i] = f1[i];
+      }
+      else if(f1.length <= i && f2.length > i && f3.length <= i){
+        combi[i] = f2[i];
+      }
+      else if(f1.length <= i && f2.length <= i && f3.length > i){
+        combi[i] = f3[i];
+      }
+      else {
+        throw new IllegalStateException("one of the three feature vectors should be same length as combi.length");
       }
     }
 

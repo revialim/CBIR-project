@@ -43,7 +43,7 @@ public class ColorHistogramYCgCo extends FeatureFactory {
   public float[] getFeatureVector(Pic image) {
     BufferedImage bi = image.getDisplayImage();
     int bins = settings.getBins();
-    float[] featureVector = new float[bins * bins * 2];
+    float[] featureVector = new float[bins * bins * bins * 2];
 
     int width = bi.getWidth();
     int height = bi.getHeight();
@@ -77,31 +77,46 @@ public class ColorHistogramYCgCo extends FeatureFactory {
 
   private static int getIndex(YCgCoCol ycgco, int bins){
     double binStepLum = 1.0 / bins;
-    double binStepAngle = 360 / (bins*2);
-    double binStepRadius = 1.0 / bins;
+    double binStepAngle = 360 / (bins * 2);
+    double binStepRadius = Math.sqrt(0.5*0.5) / bins;
 
     int lumIndex = (int) (ycgco.getLum() / binStepLum);
     lumIndex = (lumIndex == bins) ? lumIndex-1 : lumIndex;
 
     double angle = getAngle(ycgco);
     int cgcoIndex = (int) (angle / binStepAngle);
+    cgcoIndex = (cgcoIndex == (bins * 2))? cgcoIndex-1 : cgcoIndex;
 
-    return lumIndex * (bins*2) + cgcoIndex;
+    double radius = getRadius(ycgco);
+    int radiusIndex = (int) (radius / binStepRadius);
+    radiusIndex = (radiusIndex == bins) ? radiusIndex-1 : radiusIndex;
+
+    return (radiusIndex * bins * (bins*2) + lumIndex * (bins*2) + cgcoIndex);
   }
 
   private static double getAngle(YCgCoCol ycgco){
-    double radius = Math.sqrt(ycgco.getCg()*ycgco.getCg() + ycgco.getCo()*ycgco.getCo());
+    double radius = getRadius(ycgco);
 
+    double radians;
     if(radius != 0 && ycgco.getCo() >= 0){
-      return Math.acos(ycgco.getCg()/radius);
+      radians = Math.acos(ycgco.getCg()/radius);
     } else if(radius != 0 && ycgco.getCo() < 0){
-      return -Math.acos(ycgco.getCg()/radius);
+      radians = -Math.acos(ycgco.getCg()/radius);
     } else if(radius == 0){
       return 0;
     }
     else {
       throw new IllegalStateException("ycgco.getCo() was neither bigger, equal nor same to zero: "+ycgco.getCo());
     }
+
+    //convert radians to degree between 0 and 360
+    double degrees = radians * 180 / Math.PI;
+    //shift by 180 because only positive degrees wanted
+    return degrees + 180;
+  }
+
+  private static double getRadius(YCgCoCol ycgco){
+    return Math.sqrt(ycgco.getCg()*ycgco.getCg() + ycgco.getCo()*ycgco.getCo());
   }
 
   private static float getMaxValue(float[] arr){

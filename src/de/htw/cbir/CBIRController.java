@@ -205,6 +205,14 @@ public class CBIRController {
 				calculateFeatureVectors(featureFactory, imageManager.getImages());
 			});
 
+      settings.addChangeListener(Settings.SettingOption.ALPHA, (SettingChangeEvent event) -> {
+        calculateFeatureVectors(featureFactory, imageManager.getImages());
+      });
+
+      settings.addChangeListener(Settings.SettingOption.BETA, (SettingChangeEvent event) -> {
+        calculateFeatureVectors(featureFactory, imageManager.getImages());
+      });
+
 			settings.addChangeListener(Settings.SettingOption.METRIC, (SettingChangeEvent event) -> {
 				calculateFeatureVectors(featureFactory, imageManager.getImages());
 			});
