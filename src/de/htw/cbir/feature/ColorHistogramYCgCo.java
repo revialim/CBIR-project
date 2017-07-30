@@ -42,7 +42,7 @@ public class ColorHistogramYCgCo extends FeatureFactory {
   @Override
   public float[] getFeatureVector(Pic image) {
     BufferedImage bi = image.getDisplayImage();
-    int bins = settings.getResolution(); //TODO
+    int bins = settings.getBins();
     float[] featureVector = new float[bins * bins * 2];
 
     int width = bi.getWidth();
@@ -91,11 +91,14 @@ public class ColorHistogramYCgCo extends FeatureFactory {
   private static double getAngle(YCgCoCol ycgco){
     double radius = Math.sqrt(ycgco.getCg()*ycgco.getCg() + ycgco.getCo()*ycgco.getCo());
 
-    if(ycgco.getCo() >= 0){
+    if(radius != 0 && ycgco.getCo() >= 0){
       return Math.acos(ycgco.getCg()/radius);
-    } else if(ycgco.getCo() < 0){
-      return  -Math.acos(ycgco.getCg()/radius);
-    } else {
+    } else if(radius != 0 && ycgco.getCo() < 0){
+      return -Math.acos(ycgco.getCg()/radius);
+    } else if(radius == 0){
+      return 0;
+    }
+    else {
       throw new IllegalStateException("ycgco.getCo() was neither bigger, equal nor same to zero: "+ycgco.getCo());
     }
   }

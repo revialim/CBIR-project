@@ -186,7 +186,7 @@ public class CBIRController {
 		else if(name.equalsIgnoreCase("ColorHistogramYCgCo")) {
 			featureFactory = new ColorHistogramYCgCo(settings);
 
-			settings.addChangeListener(Settings.SettingOption.RESOLUTION, (SettingChangeEvent event) -> {
+			settings.addChangeListener(Settings.SettingOption.BINS, (SettingChangeEvent event) -> {
 				calculateFeatureVectors(featureFactory, imageManager.getImages());
 			});
 
