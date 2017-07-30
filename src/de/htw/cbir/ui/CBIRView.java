@@ -128,7 +128,7 @@ public class CBIRView  {
 
 		// Bins sub-menu
 		JMenu m_binsValue = new JMenu("Bins");
-		final JSliderDecimal binsSlider = JSliderDecimal.createDoubleJSlider(1, 20, 4, 1);
+		final JSliderDecimal binsSlider = JSliderDecimal.createDoubleJSlider(1, 15, 4, 1);
 		binsSlider.setMajorTickSpacing(4);
 		binsSlider.setMinorTickSpacing(1);
 		binsSlider.setPaintTicks(true);
@@ -141,7 +141,39 @@ public class CBIRView  {
 		});
 		m_binsValue.add(binsSlider);
 		settingsMenu.add(m_binsValue);
-		
+
+		//Alpha sub-menu
+		JMenu m_alphaValue = new JMenu("Alpha Value");
+		final JSliderDecimal alphaSlider = JSliderDecimal.createDoubleJSlider(0, 1, 0.3, 1);
+		alphaSlider.setMajorTickSpacing(0.5);
+		alphaSlider.setMinorTickSpacing(0.1);
+		alphaSlider.setPaintTicks(true);
+		alphaSlider.setPaintLabels(true);
+		alphaSlider.addChangeListener((ChangeEvent e) -> {
+			if(!alphaSlider.getValueIsAdjusting()){
+				System.out.println("alpha: "+ alphaSlider.getDecimalValue());
+				controller.getSettings().setAlpha(alphaSlider.getDecimalValue());
+			}
+		});
+		m_alphaValue.add(alphaSlider);
+		settingsMenu.add(m_alphaValue);
+
+    //beta sub-menu
+		JMenu m_betaValue = new JMenu("Beta Value");
+		final JSliderDecimal betaSlider = JSliderDecimal.createDoubleJSlider(0, 1, 0.3, 1);
+		betaSlider.setMajorTickSpacing(0.5);
+		betaSlider.setMinorTickSpacing(0.1);
+		betaSlider.setPaintTicks(true);
+		betaSlider.setPaintLabels(true);
+		betaSlider.addChangeListener((ChangeEvent e) -> {
+			if(!betaSlider.getValueIsAdjusting()){
+				System.out.println("beta: "+ betaSlider.getDecimalValue());
+				controller.getSettings().setBeta(betaSlider.getDecimalValue());
+			}
+		});
+		m_betaValue.add(betaSlider);
+		settingsMenu.add(m_betaValue);
+
 		// Metric sub-menu
 		JMenu m_metricValue = new JMenu("Metric");
 		final JSliderDecimal metricSlider = JSliderDecimal.createDoubleJSlider(1, 3, 1, 1);

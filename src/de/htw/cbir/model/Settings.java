@@ -10,6 +10,8 @@ public class Settings {
 	private float saturation = 1;
 	private int resolution = 4;//16
 	private int bins = 4;
+	private double alpha = 0.3;
+	private double beta = 0.3;
 	private int metric = 1;
 
 	public float getSaturation() {
@@ -38,7 +40,25 @@ public class Settings {
 		this.bins = bins;
 		fireEvent(new SettingChangeEvent(SettingOption.BINS, bins));
 	}
-	
+
+	public double getAlpha() {
+		return alpha;
+	}
+
+	public void setAlpha(double alpha) {
+		this.alpha = alpha;
+		fireEvent(new SettingChangeEvent(SettingOption.ALPHA, alpha));
+	}
+
+	public double getBeta() {
+		return beta;
+	}
+
+	public void setBeta(double beta) {
+		this.beta = beta;
+		fireEvent(new SettingChangeEvent(SettingOption.BETA, beta));
+	}
+
 	public int getMetric(){
 		return metric;
 	}
@@ -56,7 +76,7 @@ public class Settings {
 	 * Alle Einstellungen die über Kontrollelement geändert werden können
 	 * brauchen eine SettingOption. Diese Identifiziert das Event.
 	 */
-	public static enum SettingOption { SATURATION, RESOLUTION, METRIC, BINS };
+	public static enum SettingOption { SATURATION, RESOLUTION, METRIC, BINS, ALPHA, BETA };
 	
 	/**
 	 * SettingOption gibt an bei welchen Events die Listener informiert werden sollen.
@@ -67,9 +87,7 @@ public class Settings {
 	/**
 	 * Feuer ein Event an allen Listener die sich für eine Änderung
 	 * and der <SettingOption> Einstellung interessieren.
-	 * 
-	 * @param settingOpt
-	 * @param ev
+	 *
 	 */
 	private void fireEvent(SettingChangeEvent event) {
 		List<SettingChangeEventListener> listeners = eventListeners.get(event.getSetting());
@@ -83,9 +101,7 @@ public class Settings {
 	/**
 	 * Fügt einen Event Listener hinzu der informiert wird wenn die <SettingOption> 
 	 * Einstellung von einem UI Element (vom Anwendert) geändert wurde.
-	 * 
-	 * @param settingOption
-	 * @param actionListener
+	 *
 	 */
 	public void addChangeListener(SettingOption settingOption, SettingChangeEventListener actionListener) {
 		if(actionListener == null) return;
