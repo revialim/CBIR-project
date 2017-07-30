@@ -78,6 +78,7 @@ public class ColorHistogramYCgCo extends FeatureFactory {
   private static int getIndex(YCgCoCol ycgco, int bins){
     double binStepLum = 1.0 / bins;
     double binStepAngle = 360 / (bins*2);
+    double binStepRadius = 1.0 / bins;
 
     int lumIndex = (int) (ycgco.getLum() / binStepLum);
     lumIndex = (lumIndex == bins) ? lumIndex-1 : lumIndex;
