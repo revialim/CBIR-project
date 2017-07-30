@@ -111,7 +111,7 @@ public class CBIRController {
 	 * @return
 	 */
 	public String[] getFeatureFactoryNames() {
-		return new String[] { "ColorMean", "ColorMeanSaturation", "ColorMeanThumbnail", "ColorHistogram", "ColorSignature", "YCbCrHistogram" };
+		return new String[] { "ColorMean", "ColorMeanSaturation", "ColorMeanThumbnail", "ColorHistogram", "ColorSignature", "YCbCrHistogram", "ColorHistogramYCgCo", "FeatureCombination" };
 	}
 	
 	/**
@@ -174,6 +174,32 @@ public class CBIRController {
 		}
 		else if(name.equalsIgnoreCase("YCbCrHistogram")) {
 			featureFactory = new ColorHistogramYCbCr(settings);
+
+			settings.addChangeListener(Settings.SettingOption.RESOLUTION, (SettingChangeEvent event) -> {
+				calculateFeatureVectors(featureFactory, imageManager.getImages());
+			});
+
+			settings.addChangeListener(Settings.SettingOption.METRIC, (SettingChangeEvent event) -> {
+				calculateFeatureVectors(featureFactory, imageManager.getImages());
+			});
+		}
+		else if(name.equalsIgnoreCase("ColorHistogramYCgCo")) {
+			featureFactory = new ColorHistogramYCgCo(settings);
+
+			settings.addChangeListener(Settings.SettingOption.BINS, (SettingChangeEvent event) -> {
+				calculateFeatureVectors(featureFactory, imageManager.getImages());
+			});
+
+			settings.addChangeListener(Settings.SettingOption.METRIC, (SettingChangeEvent event) -> {
+				calculateFeatureVectors(featureFactory, imageManager.getImages());
+			});
+		}
+		else if(name.equalsIgnoreCase("FeatureCombination")) {
+			featureFactory = new FeatureCombination(settings);
+
+			settings.addChangeListener(Settings.SettingOption.BINS, (SettingChangeEvent event) -> {
+				calculateFeatureVectors(featureFactory, imageManager.getImages());
+			});
 
 			settings.addChangeListener(Settings.SettingOption.RESOLUTION, (SettingChangeEvent event) -> {
 				calculateFeatureVectors(featureFactory, imageManager.getImages());

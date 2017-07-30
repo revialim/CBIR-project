@@ -9,6 +9,7 @@ public class Settings {
 	
 	private float saturation = 1;
 	private int resolution = 4;//16
+	private int bins = 4;
 	private int metric = 1;
 
 	public float getSaturation() {
@@ -22,11 +23,20 @@ public class Settings {
 	
 	public int getResolution(){
 		return resolution;
-	}
-	
+}
+
 	public void setResolution(int resolution){
 		this.resolution = resolution;
 		fireEvent(new SettingChangeEvent(SettingOption.RESOLUTION, resolution));
+	}
+
+	public int getBins(){
+		return bins;
+	}
+
+	public void setBins(int bins){
+		this.bins = bins;
+		fireEvent(new SettingChangeEvent(SettingOption.BINS, bins));
 	}
 	
 	public int getMetric(){
@@ -46,7 +56,7 @@ public class Settings {
 	 * Alle Einstellungen die über Kontrollelement geändert werden können
 	 * brauchen eine SettingOption. Diese Identifiziert das Event.
 	 */
-	public static enum SettingOption { SATURATION, RESOLUTION, METRIC };
+	public static enum SettingOption { SATURATION, RESOLUTION, METRIC, BINS };
 	
 	/**
 	 * SettingOption gibt an bei welchen Events die Listener informiert werden sollen.

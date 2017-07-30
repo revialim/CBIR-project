@@ -125,8 +125,24 @@ public class CBIRView  {
 		});
 		m_resValue.add(resSlider);
 		settingsMenu.add(m_resValue);
+
+		// Bins sub-menu
+		JMenu m_binsValue = new JMenu("Bins");
+		final JSliderDecimal binsSlider = JSliderDecimal.createDoubleJSlider(1, 20, 4, 1);
+		binsSlider.setMajorTickSpacing(4);
+		binsSlider.setMinorTickSpacing(1);
+		binsSlider.setPaintTicks(true);
+		binsSlider.setPaintLabels(true);
+		binsSlider.addChangeListener((ChangeEvent e) -> {
+			if(!binsSlider.getValueIsAdjusting()){
+				System.out.println("bins: "+(int)binsSlider.getDecimalValue());
+				controller.getSettings().setBins((int)binsSlider.getDecimalValue());
+			}
+		});
+		m_binsValue.add(binsSlider);
+		settingsMenu.add(m_binsValue);
 		
-		// Resolution sub-menu
+		// Metric sub-menu
 		JMenu m_metricValue = new JMenu("Metric");
 		final JSliderDecimal metricSlider = JSliderDecimal.createDoubleJSlider(1, 3, 1, 1);
 		metricSlider.setMajorTickSpacing(1);
