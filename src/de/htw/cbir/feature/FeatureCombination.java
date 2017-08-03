@@ -29,21 +29,6 @@ public class FeatureCombination extends FeatureFactory {
 
     BufferedImage bi = new BufferedImage(size , size, BufferedImage.TYPE_INT_ARGB);
 
-    //if(featureVector.length > 1) {
-    //  for (int i = 0; i < size; i++) {
-    //    int scaledHeight = (int) (featureVector[i] / maxVal * (size - (size/10)));
-//
-    //    for (int j = 0; j < scaledHeight; j++) {
-    //      bi.setRGB(i, size - j - 1, Color.WHITE.getRGB());
-    //    }
-    //    for (int j = scaledHeight; j < size; j++) {
-    //      bi.setRGB(i, size - j - 1, Color.BLACK.getRGB());
-    //    }
-    //  }
-    //} else {
-    //  bi.setRGB(0,0,Color.WHITE.getRGB());
-    //}
-
     for(int x = 0; x < size; x ++){
       for(int y = 0; y < size; y ++){
         bi.setRGB(x, y, Color.WHITE.getRGB());
@@ -55,7 +40,7 @@ public class FeatureCombination extends FeatureFactory {
 
   @Override
   public float[] getFeatureVector(Pic image) {
-    //TODO combine both feature vectors
+    //combining both feature vectors
     float[] f1 = normalize(histogramYCgCo.getFeatureVector(image));
     float[] f2 = normalize(thumbnail.getFeatureVector(image));
     float[] f3 = normalize(histogramRGB.getFeatureVector(image));

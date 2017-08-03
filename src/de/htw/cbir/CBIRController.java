@@ -111,7 +111,7 @@ public class CBIRController {
 	 * @return
 	 */
 	public String[] getFeatureFactoryNames() {
-		return new String[] { "ColorMean", "ColorMeanSaturation", "ColorMeanThumbnail", "ColorHistogram", "ColorSignature", "YCbCrHistogram", "ColorHistogramYCgCo", "FeatureCombination" };
+		return new String[] { "ColorMean", "ColorMeanSaturation", "ColorMeanThumbnail", "ColorHistogram", "ColorSignature", "YCbCrHistogram", "ColorHistogramYCgCo", "EdgeHistogram", "FeatureCombination" };
 	}
 	
 	/**
@@ -194,6 +194,18 @@ public class CBIRController {
 				calculateFeatureVectors(featureFactory, imageManager.getImages());
 			});
 		}
+		else if(name.equalsIgnoreCase("EdgeHistogram")) {
+			featureFactory = new EdgeHistogram(settings);
+
+			settings.addChangeListener(Settings.SettingOption.RESOLUTION, (SettingChangeEvent event) -> {
+				calculateFeatureVectors(featureFactory, imageManager.getImages());
+			});
+
+			settings.addChangeListener(Settings.SettingOption.METRIC, (SettingChangeEvent event) -> {
+				calculateFeatureVectors(featureFactory, imageManager.getImages());
+			});
+		}
+
 		else if(name.equalsIgnoreCase("FeatureCombination")) {
 			featureFactory = new FeatureCombination(settings);
 
